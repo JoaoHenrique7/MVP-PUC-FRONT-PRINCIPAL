@@ -26,7 +26,7 @@ export const App: React.FC = () => {
       icon: 'success',
       confirmButtonColor: '#3085d6',
       confirmButtonText: 'OK'
-      
+
     });
   };
 
@@ -61,8 +61,16 @@ export const App: React.FC = () => {
       const res = await fetch(API_URL);
       if (!res.ok) throw new Error("Erro ao carregar endereços");
       const data = await res.json();
-      setEnderecos(data);
-    } catch {
+
+      // Garante que é um array
+      if (Array.isArray(data.enderecos)) {
+        setEnderecos(data.enderecos);
+      } else {
+        setEnderecos([]);
+        console.warn("Resposta inesperada da API:", data);
+      }
+    } catch (err) {
+      console.error(err);
       showErrorAlert("Erro!", "Não foi possível carregar os endereços.");
     }
   }, []);
@@ -226,128 +234,134 @@ export const App: React.FC = () => {
 
         {/* Lista de endereços */}
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {enderecos.map((end) => (
-            <li
-              key={end.id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "1rem",
-                marginBottom: "0.5rem",
-                borderRadius: "5px",
-                backgroundColor: "#fafafa"
-              }}
-            >
-              {editId === end.id ? (
-                // Modo edição
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  <input
-                    value={editData.cep || ""}
-                    placeholder="CEP"
-                    onChange={(e) => handleEditChange(e, "cep")}
-                    style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
-                  />
-                  <input
-                    value={editData.logradouro || ""}
-                    placeholder="Logradouro"
-                    onChange={(e) => handleEditChange(e, "logradouro")}
-                    style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
-                  />
-                  <input
-                    value={editData.bairro || ""}
-                    placeholder="Bairro"
-                    onChange={(e) => handleEditChange(e, "bairro")}
-                    style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
-                  />
-                  <input
-                    value={editData.localidade || ""}
-                    placeholder="Cidade"
-                    onChange={(e) => handleEditChange(e, "localidade")}
-                    style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
-                  />
-                  <input
-                    value={editData.uf || ""}
-                    placeholder="UF"
-                    onChange={(e) => handleEditChange(e, "uf")}
-                    style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
-                    maxLength={2}
-                  />
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <button
-                      onClick={saveEdit}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      💾 Salvar
-                    </button>
-                    <button
-                      onClick={() => setEditId(null)}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        backgroundColor: "#6c757d",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      ❌ Cancelar
-                    </button>
+          {enderecos.length > 0 ? (
+            enderecos.map((end) => (
+              <li
+                key={end.id}
+                style={{
+                  border: "1px solid #ccc",
+                  padding: "1rem",
+                  marginBottom: "0.5rem",
+                  borderRadius: "5px",
+                  backgroundColor: "#fafafa"
+                }}
+              >
+                {editId === end.id ? (
+                  // Modo edição
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <input
+                      value={editData.cep || ""}
+                      placeholder="CEP"
+                      onChange={(e) => handleEditChange(e, "cep")}
+                      style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
+                    />
+                    <input
+                      value={editData.logradouro || ""}
+                      placeholder="Logradouro"
+                      onChange={(e) => handleEditChange(e, "logradouro")}
+                      style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
+                    />
+                    <input
+                      value={editData.bairro || ""}
+                      placeholder="Bairro"
+                      onChange={(e) => handleEditChange(e, "bairro")}
+                      style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
+                    />
+                    <input
+                      value={editData.localidade || ""}
+                      placeholder="Cidade"
+                      onChange={(e) => handleEditChange(e, "localidade")}
+                      style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
+                    />
+                    <input
+                      value={editData.uf || ""}
+                      placeholder="UF"
+                      onChange={(e) => handleEditChange(e, "uf")}
+                      style={{ padding: "0.5rem", border: "1px solid #ddd", borderRadius: "3px" }}
+                      maxLength={2}
+                    />
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <button
+                        onClick={saveEdit}
+                        style={{
+                          padding: "0.5rem 1rem",
+                          backgroundColor: "#28a745",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "3px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        💾 Salvar
+                      </button>
+                      <button
+                        onClick={() => setEditId(null)}
+                        style={{
+                          padding: "0.5rem 1rem",
+                          backgroundColor: "#6c757d",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "3px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        ❌ Cancelar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                // Modo visualização
-                <div>
-                  {/* <strong>{end.cep}</strong> - {end.logradouro}, {end.bairro}, {end.localidade}/{end.uf} */}
-                  <div style={{ color: "#000000" }}>
-                    <strong>{end.cep}</strong> - {end.logradouro}, {end.bairro}, {end.localidade}/{end.uf}
+                ) : (
+                  // Modo visualização
+                  <div>
+                    {/* <strong>{end.cep}</strong> - {end.logradouro}, {end.bairro}, {end.localidade}/{end.uf} */}
+                    <div style={{ color: "#000000" }}>
+                      <strong>{end.cep}</strong> - {end.logradouro}, {end.bairro}, {end.localidade}/{end.uf}
+                    </div>
+                    <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}>
+                      <button
+                        onClick={() => {
+                          setEditId(end.id);
+                          setEditData({
+                            cep: end.cep,
+                            logradouro: end.logradouro,
+                            bairro: end.bairro,
+                            localidade: end.localidade,
+                            uf: end.uf,
+                          });
+                        }}
+                        style={{
+                          padding: "0.4rem 0.8rem",
+                          backgroundColor: "#ffc107",
+                          color: "black",
+                          border: "none",
+                          borderRadius: "3px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        onClick={() => deleteEndereco(end.id, `${end.cep} - ${end.logradouro}`)}
+                        style={{
+                          padding: "0.4rem 0.8rem",
+                          backgroundColor: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "3px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        🗑 Excluir
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}>
-                    <button
-                      onClick={() => {
-                        setEditId(end.id);
-                        setEditData({
-                          cep: end.cep,
-                          logradouro: end.logradouro,
-                          bairro: end.bairro,
-                          localidade: end.localidade,
-                          uf: end.uf,
-                        });
-                      }}
-                      style={{
-                        padding: "0.4rem 0.8rem",
-                        backgroundColor: "#ffc107",
-                        color: "black",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      ✏️ Editar
-                    </button>
-                    <button
-                      onClick={() => deleteEndereco(end.id, `${end.cep} - ${end.logradouro}`)}
-                      style={{
-                        padding: "0.4rem 0.8rem",
-                        backgroundColor: "#dc3545",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "3px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      🗑 Excluir
-                    </button>
-                  </div>
-                </div>
-              )}
+                )}
+              </li>
+            ))
+          ) : (
+            <li style={{ textAlign: "center", color: "#666" }}>
+              Nenhum endereço encontrado
             </li>
-          ))}
+          )}
         </ul>
       </div>
     </div>
