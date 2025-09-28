@@ -56,3 +56,6 @@ Sobe frontend (3000) e backend (5000) juntos.
 - Comunicação entre frontend e backend via HTTP REST.
 - Pode ser rodado localmente ou via Docker.
 
+
+# Diagrama
+<img alt="image" src="./src/assets/Diagrama.jpeg" />
